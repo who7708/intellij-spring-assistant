@@ -8,13 +8,13 @@ import lombok.Data;
  */
 @Data
 public class SpringConfigurationMetadataValueProvider {
-  /**
-   * The name of the provider to use to offer additional content assistance for the element to which the hint refers.
-   */
-  @SerializedName("name")
-  private SpringConfigurationMetadataValueProviderType type;
-  /**
-   * Any additional parameter that the provider supports (check the documentation of the provider for more details).
-   */
-  private SpringConfigurationMetadataValueProviderParams parameters;
+    /**
+     * The name of the provider to use to offer additional content assistance for the element to which the hint refers.
+     */
+    @SerializedName("name")
+    private SpringConfigurationMetadataValueProviderType type;
+    /**
+     * Any additional parameter that the provider supports (check the documentation of the provider for more details).
+     */
+    private SpringConfigurationMetadataValueProviderParams parameters;
 }

@@ -13,14 +13,14 @@ import static java.util.Collections.emptyList;
 
 public class VersionRangeDeserializer implements JsonDeserializer<VersionRange> {
 
-  @Override
-  public VersionRange deserialize(JsonElement jsonElement, Type type,
-      JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-    String versionRangeAsStr = jsonElement.getAsString();
-    if (versionRangeAsStr != null) {
-      return new VersionParser(emptyList()).parseRange(versionRangeAsStr);
+    @Override
+    public VersionRange deserialize(JsonElement jsonElement, Type type,
+                                    JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        String versionRangeAsStr = jsonElement.getAsString();
+        if (versionRangeAsStr != null) {
+            return new VersionParser(emptyList()).parseRange(versionRangeAsStr);
+        }
+        return null;
     }
-    return null;
-  }
 
 }

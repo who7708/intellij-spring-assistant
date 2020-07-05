@@ -67,7 +67,8 @@ String changeLogAsHtml() {
 
 intellij {
     version 'IC-2017.2'
-    plugins = ['properties', 'yaml', 'maven', 'gradle', 'Lombook Plugin:0.16-2017.2']
+    // version 'IC-2020.1'
+    plugins = ['properties', 'yaml', 'maven', 'gradle']
     downloadSources true
     patchPluginXml {
         pluginDescription readmeXmlAsHtml()

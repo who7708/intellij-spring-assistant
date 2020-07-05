@@ -22,200 +22,187 @@ import java.util.Optional;
 @ToString
 public class InitializerMetadata {
 
-  @SerializedName("dependencies")
-  private DependencyComposite dependencyComposite;
+    @SerializedName("dependencies")
+    private DependencyComposite dependencyComposite;
 
-  @SerializedName("type")
-  private ProjectTypeComposite projectTypeComposite;
+    @SerializedName("type")
+    private ProjectTypeComposite projectTypeComposite;
 
-  @SerializedName("packaging")
-  private IdAndNameComposite packagingTypeComposite;
+    @SerializedName("packaging")
+    private IdAndNameComposite packagingTypeComposite;
 
-  @SerializedName("javaVersion")
-  private IdAndNameComposite javaVersionComposite;
+    @SerializedName("javaVersion")
+    private IdAndNameComposite javaVersionComposite;
 
-  @SerializedName("language")
-  private IdAndNameComposite languageComposite;
+    @SerializedName("language")
+    private IdAndNameComposite languageComposite;
 
-  @SerializedName("bootVersion")
-  private IdAndNameComposite bootVersionComposite;
+    @SerializedName("bootVersion")
+    private IdAndNameComposite bootVersionComposite;
 
-  @SerializedName("groupId")
-  private DefaultValueHolder groupIdHolder;
+    @SerializedName("groupId")
+    private DefaultValueHolder groupIdHolder;
 
-  @SerializedName("artifactId")
-  private DefaultValueHolder artifactIdHolder;
+    @SerializedName("artifactId")
+    private DefaultValueHolder artifactIdHolder;
 
-  @SerializedName("version")
-  private DefaultValueHolder versionHolder;
+    @SerializedName("version")
+    private DefaultValueHolder versionHolder;
 
-  @SerializedName("name")
-  private DefaultValueHolder nameHolder;
+    @SerializedName("name")
+    private DefaultValueHolder nameHolder;
 
-  @SerializedName("description")
-  private DefaultValueHolder descriptionHolder;
+    @SerializedName("description")
+    private DefaultValueHolder descriptionHolder;
 
-  @SerializedName("packageName")
-  private DefaultValueHolder packageNameHolder;
+    @SerializedName("packageName")
+    private DefaultValueHolder packageNameHolder;
 
-
-  public interface IdContainer {
-    String getId();
-  }
-
-
-  // TODO: Not sure why uncommenting the line below is making the compilation fail
-  //  @Data
-  //  @ToString
-  public static class DependencyComposite {
-    @Getter
-    @Setter
-    @SerializedName("values")
-    private List<DependencyGroup> groups;
-
-    @NotNull
-    public Optional<DependencyGroup> findGroupForDependency(Dependency dependency) {
-      return groups.stream()
-          .filter(group -> group.getDependencies().stream().anyMatch(dep -> dep.equals(dependency)))
-          .findFirst();
+    public interface IdContainer {
+        String getId();
     }
 
     // TODO: Not sure why uncommenting the line below is making the compilation fail
-    //    @Data
-    //    @EqualsAndHashCode(of = "name")
-    public static class DependencyGroup {
-      @Getter
-      @Setter
-      private String name;
-      @Getter
-      @Setter
-      @SerializedName("values")
-      private List<Dependency> dependencies;
+    //  @Data
+    //  @ToString
+    public static class DependencyComposite {
+        @Getter
+        @Setter
+        @SerializedName("values")
+        private List<DependencyGroup> groups;
 
-      @Override
-      public int hashCode() {
-        return name.hashCode();
-      }
-
-      @Override
-      public boolean equals(Object obj) {
-        return obj != null && obj instanceof DependencyGroup && ((DependencyGroup) obj).name != null
-            && name.equals(((DependencyGroup) obj).name);
-      }
-
-      @Override
-      public String toString() {
-        return name;
-      }
-
-
-      @Data
-      @EqualsAndHashCode(of = "id")
-      public static class Dependency {
-        private String id;
-        private String name;
-        private String description;
-        @Nullable
-        private VersionRange versionRange;
-        @Nullable
-        @SerializedName("_links")
-        private DependencyLinksContainer linksContainer;
-
-        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-        public boolean isVersionCompatible(Version bootVersion) {
-          return versionRange == null || versionRange.match(bootVersion);
+        @NotNull
+        public Optional<DependencyGroup> findGroupForDependency(Dependency dependency) {
+            return groups.stream().filter(group -> group.getDependencies().stream().anyMatch(dep -> dep.equals(dependency))).findFirst();
         }
 
+        // TODO: Not sure why uncommenting the line below is making the compilation fail
+        //    @Data
+        //    @EqualsAndHashCode(of = "name")
+        public static class DependencyGroup {
+            @Getter
+            @Setter
+            private String name;
+            @Getter
+            @Setter
+            @SerializedName("values")
+            private List<Dependency> dependencies;
+
+            @Override
+            public int hashCode() {
+                return name.hashCode();
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                return obj != null && obj instanceof DependencyGroup && ((DependencyGroup) obj).name != null && name.equals(((DependencyGroup) obj).name);
+            }
+
+            @Override
+            public String toString() {
+                return name;
+            }
+
+            @Data
+            @EqualsAndHashCode(of = "id")
+            public static class Dependency {
+                private String id;
+                private String name;
+                private String description;
+                @Nullable
+                private VersionRange versionRange;
+                @Nullable
+                @SerializedName("_links")
+                private DependencyLinksContainer linksContainer;
+
+                @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+                public boolean isVersionCompatible(Version bootVersion) {
+                    return versionRange == null || versionRange.match(bootVersion);
+                }
+
+                @Data
+                public static class DependencyLinksContainer {
+                    @Nullable
+                    @SerializedName("reference")
+                    private List<DependencyLink> references;
+                    @Nullable
+                    @SerializedName("guide")
+                    private List<DependencyLink> guides;
+
+                    @Getter
+                    @Setter
+                    @Builder
+                    @NoArgsConstructor
+                    @AllArgsConstructor
+                    @ToString
+                    public static class DependencyLink {
+                        private String href;
+                        @Nullable
+                        private String title;
+                        private boolean templated;
+
+                        @NotNull
+                        public String getHrefAfterReplacement(String bootVersion) {
+                            if (templated) {
+                                return href.replaceAll("\\{bootVersion}", bootVersion);
+                            }
+                            return href;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Data
+    public static class ProjectTypeComposite {
+        @SerializedName("default")
+        private String defaultValue;
+        @SerializedName("values")
+        private List<ProjectType> types;
 
         @Data
-        public static class DependencyLinksContainer {
-          @Nullable
-          @SerializedName("reference")
-          private List<DependencyLink> references;
-          @Nullable
-          @SerializedName("guide")
-          private List<DependencyLink> guides;
+        @EqualsAndHashCode(of = "id")
+        public static class ProjectType implements IdContainer {
+            private String id;
+            private String name;
+            private String description;
+            private String action;
 
-
-          @Getter
-          @Setter
-          @Builder
-          @NoArgsConstructor
-          @AllArgsConstructor
-          @ToString
-          public static class DependencyLink {
-            private String href;
-            @Nullable
-            private String title;
-            private boolean templated;
-
-            @NotNull
-            public String getHrefAfterReplacement(String bootVersion) {
-              if (templated) {
-                return href.replaceAll("\\{bootVersion}", bootVersion);
-              }
-              return href;
+            @Override
+            public String toString() {
+                return name;
             }
-          }
         }
-      }
     }
-  }
 
-
-  @Data
-  public static class ProjectTypeComposite {
-    @SerializedName("default")
-    private String defaultValue;
-    @SerializedName("values")
-    private List<ProjectType> types;
-
+    @Data
+    public static class IdAndNameComposite {
+        @SerializedName("default")
+        private String defaultValue;
+        private List<IdAndName> values;
+    }
 
     @Data
     @EqualsAndHashCode(of = "id")
-    public static class ProjectType implements IdContainer {
-      private String id;
-      private String name;
-      private String description;
-      private String action;
+    public static class IdAndName implements IdContainer {
+        private String id;
+        private String name;
 
-      @Override
-      public String toString() {
-        return name;
-      }
-    }
-  }
+        @Override
+        public String toString() {
+            return name;
+        }
 
-
-  @Data
-  public static class IdAndNameComposite {
-    @SerializedName("default")
-    private String defaultValue;
-    private List<IdAndName> values;
-  }
-
-
-  @Data
-  @EqualsAndHashCode(of = "id")
-  public static class IdAndName implements IdContainer {
-    private String id;
-    private String name;
-
-    @Override
-    public String toString() {
-      return name;
+        public Version parseIdAsVersion() {
+            return Version.parse(id);
+        }
     }
 
-    public Version parseIdAsVersion() {
-      return Version.parse(id);
+    @Data
+    public static class DefaultValueHolder {
+        @SerializedName("default")
+        private String defaultValue;
     }
-  }
-
-
-  @Data
-  public static class DefaultValueHolder {
-    @SerializedName("default")
-    private String defaultValue;
-  }
 
 }

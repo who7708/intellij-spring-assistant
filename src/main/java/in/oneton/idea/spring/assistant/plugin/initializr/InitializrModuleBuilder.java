@@ -40,122 +40,117 @@ import static com.intellij.pom.java.LanguageLevel.parse;
 
 public class InitializrModuleBuilder extends ModuleBuilder {
 
-  public static final String CONTENT_TYPE = "application/vnd.initializr.v2.1+json";
+    public static final String CONTENT_TYPE = "application/vnd.initializr.v2.1+json";
 
-  private ProjectCreationRequest request;
+    private ProjectCreationRequest request;
 
-  @Override
-  public void setupRootModel(ModifiableRootModel modifiableRootModel) {
-    Sdk moduleOrProjectSdk = getModuleJdk() != null ?
-        getModuleJdk() :
-        getInstance(modifiableRootModel.getProject()).getProjectSdk();
-    if (moduleOrProjectSdk != null) {
-      modifiableRootModel.setSdk(moduleOrProjectSdk);
-    }
-
-    LanguageLevelModuleExtension languageLevelModuleExtension =
-        modifiableRootModel.getModuleExtension(LanguageLevelModuleExtension.class);
-    if (languageLevelModuleExtension != null && moduleOrProjectSdk != null) {
-      if (safeGetProjectCreationRequest().isJavaVersionSet()) {
-        LanguageLevel lastSelectedLanguageLevel =
-            parse(safeGetProjectCreationRequest().getJavaVersion().getId());
-        if (lastSelectedLanguageLevel != null) {
-          JavaSdkVersion lastSelectedJavaSdkVersion = fromLanguageLevel(lastSelectedLanguageLevel);
-          JavaSdkVersion moduleOrProjectLevelJavaSdkVersion =
-              getInstance().getVersion(moduleOrProjectSdk);
-          if (moduleOrProjectLevelJavaSdkVersion != null && moduleOrProjectLevelJavaSdkVersion
-              .isAtLeast(lastSelectedJavaSdkVersion)) {
-            languageLevelModuleExtension.setLanguageLevel(lastSelectedLanguageLevel);
-          }
+    @Override
+    public void setupRootModel(ModifiableRootModel modifiableRootModel) {
+        Sdk moduleOrProjectSdk = getModuleJdk() != null ? getModuleJdk() :
+                getInstance(modifiableRootModel.getProject()).getProjectSdk();
+        if (moduleOrProjectSdk != null) {
+            modifiableRootModel.setSdk(moduleOrProjectSdk);
         }
-      }
-    }
 
-    doAddContentEntry(modifiableRootModel);
-  }
-
-  @Nullable
-  public ModuleWizardStep modifySettingsStep(@NotNull SettingsStep settingsStep) {
-    JTextField moduleNameField = settingsStep.getModuleNameField();
-    if (moduleNameField != null) {
-      moduleNameField.setText(request.getArtifactId());
-    }
-
-    return super.modifySettingsStep(settingsStep);
-  }
-
-  public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext,
-      @NotNull ModulesProvider modulesProvider) {
-    return new ModuleWizardStep[] {new ProjectDetailsStep(this, wizardContext),
-        new DependencySelectionStep(this)};
-  }
-
-  @Nullable
-  public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-    return new ServerSelectionStep(this);
-  }
-
-  @NotNull
-  @Override
-  public Module createModule(@NotNull ModifiableModuleModel moduleModel)
-      throws InvalidDataException, IOException, ModuleWithNameAlreadyExists, JDOMException,
-      ConfigurationException {
-    Module module = super.createModule(moduleModel);
-    getApplication().invokeLater(() -> {
-      ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
-        try {
-          InitializerDownloader downloader = new InitializerDownloader(this);
-          downloader.execute(ProgressManager.getInstance().getProgressIndicator());
-        } catch (IOException var2) {
-          getApplication()
-              .invokeLater(() -> showErrorDialog("Error: " + var2.getMessage(), "Creation Failed"));
+        LanguageLevelModuleExtension languageLevelModuleExtension =
+                modifiableRootModel.getModuleExtension(LanguageLevelModuleExtension.class);
+        if (languageLevelModuleExtension != null && moduleOrProjectSdk != null) {
+            if (safeGetProjectCreationRequest().isJavaVersionSet()) {
+                LanguageLevel lastSelectedLanguageLevel =
+                        parse(safeGetProjectCreationRequest().getJavaVersion().getId());
+                if (lastSelectedLanguageLevel != null) {
+                    JavaSdkVersion lastSelectedJavaSdkVersion = fromLanguageLevel(lastSelectedLanguageLevel);
+                    JavaSdkVersion moduleOrProjectLevelJavaSdkVersion = getInstance().getVersion(moduleOrProjectSdk);
+                    if (moduleOrProjectLevelJavaSdkVersion != null && moduleOrProjectLevelJavaSdkVersion.isAtLeast(lastSelectedJavaSdkVersion)) {
+                        languageLevelModuleExtension.setLanguageLevel(lastSelectedLanguageLevel);
+                    }
+                }
+            }
         }
-      }, "Downloading Required Files...", true, null);
-      ModuleBuilderPostProcessor[] postProcessors =
-          ModuleBuilderPostProcessor.EXTENSION_POINT_NAME.getExtensions();
-      for (ModuleBuilderPostProcessor postProcessor : postProcessors) {
-        if (!postProcessor.postProcess(module)) {
-          return;
-        }
-      }
-    }, current());
-    return module;
-  }
 
-  @Override
-  public Icon getNodeIcon() {
-    return Icons.SpringBoot;
-  }
-
-  @Nullable
-  @Override
-  public String getBuilderId() {
-    return "Spring Boot/Cloud Dataflow Initializr";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Bootstrap spring applications using <b>Spring Boot</b> & <b>Spring Cloud Dataflow</b> starters";
-  }
-
-  @Override
-  public String getPresentableName() {
-    return "Spring Assistant";
-  }
-
-  public String getParentGroup() {
-    return "Build Tools";
-  }
-
-  @Override
-  public ModuleType getModuleType() {
-    return JAVA;
-  }
-
-  public ProjectCreationRequest safeGetProjectCreationRequest() {
-    if (request == null) {
-      request = new ProjectCreationRequest();
+        doAddContentEntry(modifiableRootModel);
     }
-    return request;
-  }
+
+    @Nullable
+    public ModuleWizardStep modifySettingsStep(@NotNull SettingsStep settingsStep) {
+        JTextField moduleNameField = settingsStep.getModuleNameField();
+        if (moduleNameField != null) {
+            moduleNameField.setText(request.getArtifactId());
+        }
+
+        return super.modifySettingsStep(settingsStep);
+    }
+
+    public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext,
+                                                @NotNull ModulesProvider modulesProvider) {
+        return new ModuleWizardStep[]{new ProjectDetailsStep(this, wizardContext), new DependencySelectionStep(this)};
+    }
+
+    @Nullable
+    public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
+        return new ServerSelectionStep(this);
+    }
+
+    @NotNull
+    @Override
+    public Module createModule(@NotNull ModifiableModuleModel moduleModel) throws InvalidDataException, IOException,
+            ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
+        Module module = super.createModule(moduleModel);
+        getApplication().invokeLater(() -> {
+            ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+                try {
+                    InitializerDownloader downloader = new InitializerDownloader(this);
+                    downloader.execute(ProgressManager.getInstance().getProgressIndicator());
+                } catch (IOException var2) {
+                    getApplication().invokeLater(() -> showErrorDialog("Error: " + var2.getMessage(), "Creation " +
+                            "Failed"));
+                }
+            }, "Downloading Required Files...", true, null);
+            ModuleBuilderPostProcessor[] postProcessors =
+                    ModuleBuilderPostProcessor.EXTENSION_POINT_NAME.getExtensions();
+            for (ModuleBuilderPostProcessor postProcessor : postProcessors) {
+                if (!postProcessor.postProcess(module)) {
+                    return;
+                }
+            }
+        }, current());
+        return module;
+    }
+
+    @Override
+    public Icon getNodeIcon() {
+        return Icons.SpringBoot;
+    }
+
+    @Nullable
+    @Override
+    public String getBuilderId() {
+        return "Spring Boot/Cloud Dataflow Initializr";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Bootstrap spring applications using <b>Spring Boot</b> & <b>Spring Cloud Dataflow</b> starters";
+    }
+
+    @Override
+    public String getPresentableName() {
+        return "Spring Assistant";
+    }
+
+    public String getParentGroup() {
+        return "Build Tools";
+    }
+
+    @Override
+    public ModuleType getModuleType() {
+        return JAVA;
+    }
+
+    public ProjectCreationRequest safeGetProjectCreationRequest() {
+        if (request == null) {
+            request = new ProjectCreationRequest();
+        }
+        return request;
+    }
 }

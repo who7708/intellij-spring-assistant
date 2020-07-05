@@ -1,12 +1,12 @@
 package in.oneton.idea.spring.assistant.plugin.suggestion.completion;
 
 public class PropertiesCompletionContributor {
-  //    extends CompletionContributor {
+    //    extends CompletionContributor {
 
-  //  public PropertiesCompletionContributor() {
-  //    extend(CompletionType.BASIC,
-  //        PlatformPatterns.psiElement().withLanguage(PropertiesLanguage.INSTANCE),
-  //        new PropertiesCompletionProvider());
-  //  }
+    //  public PropertiesCompletionContributor() {
+    //    extend(CompletionType.BASIC,
+    //        PlatformPatterns.psiElement().withLanguage(PropertiesLanguage.INSTANCE),
+    //        new PropertiesCompletionProvider());
+    //  }
 
 }

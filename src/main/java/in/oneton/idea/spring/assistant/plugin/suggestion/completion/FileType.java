@@ -7,24 +7,24 @@ import in.oneton.idea.spring.assistant.plugin.suggestion.handler.YamlValueInsert
 
 // TODO: Add properties support
 public enum FileType {
-  yaml, properties;
+    yaml, properties;
 
-  public InsertHandler<LookupElement> newKeyInsertHandler() {
-    switch (this) {
-      case yaml:
-        return new YamlKeyInsertHandler();
-      default:
-        return null;
+    public InsertHandler<LookupElement> newKeyInsertHandler() {
+        switch (this) {
+            case yaml:
+                return new YamlKeyInsertHandler();
+            default:
+                return null;
+        }
     }
-  }
 
-  public InsertHandler<LookupElement> newValueInsertHandler() {
-    switch (this) {
-      case yaml:
-        return new YamlValueInsertHandler();
-      default:
-        return null;
+    public InsertHandler<LookupElement> newValueInsertHandler() {
+        switch (this) {
+            case yaml:
+                return new YamlValueInsertHandler();
+            default:
+                return null;
+        }
     }
-  }
 
 }

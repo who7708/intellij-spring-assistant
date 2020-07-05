@@ -10,29 +10,28 @@ import static com.intellij.icons.AllIcons.Modules.DeleteContentFolder;
 import static com.intellij.icons.AllIcons.Modules.DeleteContentFolderRollover;
 
 public class SelectedDependencyListItem {
-  private SelectedDependencyListItemListener listener;
+    private SelectedDependencyListItemListener listener;
 
-  private InplaceButton deleteButton;
-  private JBLabel nameLabel;
-  private JPanel root;
+    private InplaceButton deleteButton;
+    private JBLabel nameLabel;
+    private JPanel root;
 
-  public void init(String name, SelectedDependencyListItemListener listener) {
-    this.listener = listener;
-    nameLabel.setText(name);
-  }
+    public void init(String name, SelectedDependencyListItemListener listener) {
+        this.listener = listener;
+        nameLabel.setText(name);
+    }
 
-  private void createUIComponents() {
-    deleteButton = new InplaceButton(
-        new IconButton("Click to delete", DeleteContentFolder, DeleteContentFolderRollover),
-        e -> listener.onDeleteClicked());
-  }
+    private void createUIComponents() {
+        deleteButton = new InplaceButton(new IconButton("Click to delete", DeleteContentFolder,
+                DeleteContentFolderRollover), e -> listener.onDeleteClicked());
+    }
 
-  public JPanel getRoot() {
-    return root;
-  }
+    public JPanel getRoot() {
+        return root;
+    }
 
-  interface SelectedDependencyListItemListener {
-    void onDeleteClicked();
-  }
+    interface SelectedDependencyListItemListener {
+        void onDeleteClicked();
+    }
 
 }
